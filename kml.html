@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dynamic KML Map</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+        <script src="./L.KML.js"></script> <!-- Make sure this file is in the repo -->
+    </head>
+    <body>
+        <div style="width: 100vw; height: 100vh" id="map"></div>
+        <script type="text/javascript">
+            // Helper function to get URL parameters
+            function getParameterByName(name, url = window.location.href) {
+                name = name.replace(/[\[\]]/g, '\\$&');
+                const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+                const results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, ' '));
+            }
+
+            // Get the KML URL from the URL parameter
+            const kmlUrl = getParameterByName('kml_url');
+
+            if (kmlUrl) {
+                // Initialize map
+                const map = new L.Map('map', { center: new L.LatLng(58.4, 43.0), zoom: 11 });
+                //const osm = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+                //const osm = new L.TileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
+                const osm = new L.TileLayer('http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}');
+                map.addLayer(osm);
+
+                // Load the KML file from the given URL
+                fetch(kmlUrl)
+                    .then(res => res.text())
+                    .then(kmltext => {
+                        const parser = new DOMParser();
+                        const kml = parser.parseFromString(kmltext, 'text/xml');
+                        const track = new L.KML(kml);
+                        map.addLayer(track);
+
+                        // Adjust map to show the KML
+                        const bounds = track.getBounds();
+                        map.fitBounds(bounds);
+                    })
+                    .catch(error => {
+                        console.error('Error loading KML:', error);
+                        alert('Failed to load KML file. Please check the URL.');
+                    });
+            } else {
+                alert('No KML URL provided. Please use the "kml_url" parameter in the URL.');
+            }
+        </script>
+    </body>
+</html>
