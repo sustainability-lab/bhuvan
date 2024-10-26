@@ -3,95 +3,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
-
-    <!-- Custom styling -->
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            font-family: 'Arial', sans-serif;
-            background-color: #e8eef1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        header {
-            width: 100%;
-            padding: 20px;
-            text-align: center;
-            background-color: #008080;
-            color: #fff;
-            font-size: 1.8em;
-            font-weight: bold;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        #map {
-            width: 95%;
-            height: 70vh;
-            margin-top: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        #stats {
-            width: 95%;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        #stats h3 {
-            font-size: 1.6em;
-            color: #333;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        #stats .stat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        #stats .stat-item:last-child {
-            border-bottom: none;
-        }
-
-        #stats .stat-label {
-            display: flex;
-            align-items: center;
-            font-weight: bold;
-            color: #555;
-        }
-
-        #stats .stat-label i {
-            font-style: normal;
-            color: #008080;
-            margin-right: 8px;
-        }
-
-        .value {
-            color: #008080;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        footer {
-            padding: 10px;
-            text-align: center;
-            color: #666;
-            font-size: 0.9em;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css"> <!-- Link to the external style.css file -->
+   
 </head>
 
 <body>
@@ -115,7 +28,8 @@
         </div>
     </div>
 
-    <footer>&copy; 2024 GeoJSON Map Viewer</footer>
+    <footer>&copy; 2024 GeoJSON Map Viewer by Sustainability Lab IIT Gandhinagar</footer>
+    <script src="geostats.js"></script> <!-- Custom script for area and centroid calculations -->
 
     <script type="text/javascript">
         // Initialize the map
@@ -135,14 +49,13 @@
                     // Fit map to GeoJSON bounds
                     map.fitBounds(geoJsonLayer.getBounds());
 
-                    // Calculate area and centroid using Turf.js
-                    const areaSqMeters = turf.area(data); // Area in square meters
-                    const areaHectares = areaSqMeters / 10000; // Convert to hectares
-                    const centroid = turf.centroid(data); // Centroid as a GeoJSON point
+                    // Calculate total area and centroid using the external script functions
+                    const areaData = calculateTotalArea(data);
+                    const centroid = calculateCentroid(data);
 
-                    // Display area in square meters and hectares, and centroid in HTML
-                    document.getElementById('area_sqm').textContent = areaSqMeters.toFixed(2);
-                    document.getElementById('area_hectares').textContent = areaHectares.toFixed(2);
+
+                    document.getElementById('area_sqm').textContent = areaData.areaSqMeters.toFixed(2);
+                    document.getElementById('area_hectares').textContent = areaData.areaHectares.toFixed(2);
                     document.getElementById('centroid').textContent = 
                         `Lat: ${centroid.geometry.coordinates[1].toFixed(5)}, 
                          Lng: ${centroid.geometry.coordinates[0].toFixed(5)}`;
