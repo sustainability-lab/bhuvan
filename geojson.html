@@ -1,25 +1,47 @@
-<html> <head>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" /> <script 
-    src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-</head> <body>
-    <div style="width: 100vw; height: 100vh" id="map"></div> <script type="text/javascript">
-        // Initialize the map const map = L.map('map').setView([58.4, 43.0], 11); // Add a base map layer 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map); // Function to load a GeoJSON file from a URL function loadGeoJSON(url) {
-            fetch(url)
-                .then(response => response.json()) .then(data => {
-                    const geoJsonLayer = L.geoJSON(data); geoJsonLayer.addTo(map);
+<html>
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <div style="width: 100vw; height: 100vh" id="map"></div>
+    <script type="text/javascript">
+        // Initialize the map
+        const map = L.map('map').setView([58.4, 43.0], 11);
 
-                    // Fit map to GeoJSON bounds map.fitBounds(geoJsonLayer.getBounds());
-                }) .catch(error => {
-                    console.error('Error loading GeoJSON:', error); alert('Failed to load GeoJSON file. Please check the URL.');
+        // Add a base map layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Function to load a GeoJSON file from a URL
+        function loadGeoJSON(url) {
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const geoJsonLayer = L.geoJSON(data);
+                    geoJsonLayer.addTo(map);
+
+                    // Fit map to GeoJSON bounds
+                    map.fitBounds(geoJsonLayer.getBounds());
+                })
+                .catch(error => {
+                    console.error('Error loading GeoJSON:', error);
+                    alert('Failed to load GeoJSON file. Please check the URL.');
                 });
-        } // Get the GeoJSON URL from the query parameter 'geojson_url' const urlParams = new 
-        URLSearchParams(window.location.search); const geojsonUrl = urlParams.get('geojson_url'); // Load GeoJSON if a URL is 
-        provided if (geojsonUrl) {
+        }
+
+        // Get the GeoJSON URL from the query parameter 'geojson_url'
+        const urlParams = new URLSearchParams(window.location.search);
+        const geojsonUrl = urlParams.get('geojson_url');
+
+        // Load GeoJSON if a URL is provided
+        if (geojsonUrl) {
             loadGeoJSON(geojsonUrl);
         } else {
             alert('Please provide a valid GeoJSON URL in the "geojson_url" query parameter.');
         }
-    </script> </body> </html>
+    </script>
+</body>
+</html>
