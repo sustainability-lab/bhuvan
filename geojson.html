@@ -12,8 +12,8 @@
         // Add a base map layer
         new L.TileLayer('http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}').addTo(map);
 
-        // Function to load a GeoJSON file from a URL
-        function loadGeoJSON(url) {
+               // Function to load GeoJSON and calculate statistics
+               function loadGeoJSON(url) {
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
@@ -22,6 +22,16 @@
 
                     // Fit map to GeoJSON bounds
                     map.fitBounds(geoJsonLayer.getBounds());
+
+                    // Calculate area and centroid using Turf.js
+                    const area = turf.area(data); // Area in square meters
+                    const centroid = turf.centroid(data); // Centroid as a GeoJSON point
+
+                    // Display area and centroid in HTML
+                    document.getElementById('area').textContent = area.toFixed(2);
+                    document.getElementById('centroid').textContent = 
+                        `Lat: ${centroid.geometry.coordinates[1].toFixed(5)}, 
+                         Lng: ${centroid.geometry.coordinates[0].toFixed(5)}`;
                 })
                 .catch(error => {
                     console.error('Error loading GeoJSON:', error);
