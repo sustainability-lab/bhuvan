@@ -2,28 +2,85 @@
 <head>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script> <!-- For area and centroid calculation -->
+    <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
 
+    <!-- Custom styling -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f2f5;
+        }
+
+        #map {
+            width: 100%;
+            height: 80vh;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #stats {
+            width: 100%;
+            max-width: 800px;
+            margin: 10px auto;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        #stats h3 {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #stats p {
+            font-size: 1em;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #stats p strong {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .value {
+            color: #008080;
+            font-weight: bold;
+        }
+    </style>
 </head>
+
 <body>
-    <div style="width: 100vw; height: 90vh" id="map"></div>
-    <div id="stats" style="padding: 10px; background-color: #f9f9f9;">
+    <div id="map"></div>
+
+    <div id="stats">
         <h3>GeoJSON Statistics</h3>
-        <p><strong>Area:</strong> <span id="area">Loading...</span> sq meters</p>
-        <p><strong>Centroid:</strong> <span id="centroid">Loading...</span></p>
+        <p><strong>Area (sq meters):</strong> <span id="area_sqm" class="value">Loading...</span></p>
+        <p><strong>Area (hectares):</strong> <span id="area_hectares" class="value">Loading...</span></p>
+        <p><strong>Centroid:</strong> <span id="centroid" class="value">Loading...</span></p>
     </div>
 
     <script type="text/javascript">
-        // Initialize the map
-
         // Initialize the map
         const map = L.map('map').setView([58.4, 43.0], 11);
 
         // Add a base map layer
         new L.TileLayer('http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}').addTo(map);
 
-               // Function to load GeoJSON and calculate statistics
-               function loadGeoJSON(url) {
+        // Function to load GeoJSON and calculate statistics
+        function loadGeoJSON(url) {
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
@@ -34,11 +91,13 @@
                     map.fitBounds(geoJsonLayer.getBounds());
 
                     // Calculate area and centroid using Turf.js
-                    const area = turf.area(data); // Area in square meters
+                    const areaSqMeters = turf.area(data); // Area in square meters
+                    const areaHectares = areaSqMeters / 10000; // Convert to hectares
                     const centroid = turf.centroid(data); // Centroid as a GeoJSON point
 
-                    // Display area and centroid in HTML
-                    document.getElementById('area').textContent = area.toFixed(2);
+                    // Display area in square meters and hectares, and centroid in HTML
+                    document.getElementById('area_sqm').textContent = areaSqMeters.toFixed(2);
+                    document.getElementById('area_hectares').textContent = areaHectares.toFixed(2);
                     document.getElementById('centroid').textContent = 
                         `Lat: ${centroid.geometry.coordinates[1].toFixed(5)}, 
                          Lng: ${centroid.geometry.coordinates[0].toFixed(5)}`;
