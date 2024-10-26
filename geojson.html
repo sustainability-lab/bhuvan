@@ -4,8 +4,16 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 </head>
 <body>
-    <div style="width: 100vw; height: 100vh" id="map"></div>
+    <div style="width: 100vw; height: 90vh" id="map"></div>
+    <div id="stats" style="padding: 10px; background-color: #f9f9f9;">
+        <h3>GeoJSON Statistics</h3>
+        <p><strong>Area:</strong> <span id="area">Loading...</span> sq meters</p>
+        <p><strong>Centroid:</strong> <span id="centroid">Loading...</span></p>
+    </div>
+
     <script type="text/javascript">
+        // Initialize the map
+
         // Initialize the map
         const map = L.map('map').setView([58.4, 43.0], 11);
 
