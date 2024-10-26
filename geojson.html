@@ -26,6 +26,10 @@
             <div class="stat-label"><i>📍</i> Centroid:</div>
             <div id="centroid" class="value">Loading...</div>
         </div>
+        <div class="stat-item">
+            <span class="stat-label"><i>Summary:</i></span>
+            <div class="value" id="summary">Loading...</div>
+        </div>
     </div>
 
     <footer>&copy; 2024 GeoJSON Map Viewer by Sustainability Lab IIT Gandhinagar</footer>
@@ -49,17 +53,26 @@
                     // Fit map to GeoJSON bounds
                     map.fitBounds(geoJsonLayer.getBounds());
 
-                    // Calculate total area and centroid using the external script functions
-                    const areaData = calculateTotalArea(data);
-                    const centroid = calculateCentroid(data);
+                    // Call functions from gestats.js
+                const areaStats = calculateTotalArea(data);
+                const centroid = calculateCentroid(data);
+                const geometryCounts = countGeometryTypes(data);
+                const featureNames = getFeatureNames(data);
 
-
-                    document.getElementById('area_sqm').textContent = areaData.areaSqMeters.toFixed(2);
-                    document.getElementById('area_hectares').textContent = areaData.areaHectares.toFixed(2);
-                    document.getElementById('centroid').textContent = 
-                        `Lat: ${centroid.geometry.coordinates[1].toFixed(5)}, 
-                         Lng: ${centroid.geometry.coordinates[0].toFixed(5)}`;
-                })
+                // Display area, centroid, and geometry summary in HTML
+                document.getElementById('area_sqm').textContent = areaStats.areaSqMeters.toFixed(2);
+                document.getElementById('area_hectares').textContent = areaStats.areaHectares.toFixed(2);
+                document.getElementById('centroid').textContent = 
+                    `Lat: ${centroid.geometry.coordinates[1].toFixed(5)}, 
+                    Lng: ${centroid.geometry.coordinates[0].toFixed(5)}`;
+                document.getElementById('summary').innerHTML = `
+                    <strong>Polygons:</strong> ${geometryCounts.Polygon} <br>
+                    <strong>Points:</strong> ${geometryCounts.Point} <br>
+                    <strong>LineStrings:</strong> ${geometryCounts.LineString} <br>
+                    <strong>MultiPolygons:</strong> ${geometryCounts.MultiPolygon} <br>
+                    <strong>Feature Names:</strong> ${featureNames.length > 0 ? featureNames.join(', ') : 'N/A'}
+                `;
+            })
                 .catch(error => {
                     console.error('Error loading GeoJSON:', error);
                     alert('Failed to load GeoJSON file. Please check the URL.');
